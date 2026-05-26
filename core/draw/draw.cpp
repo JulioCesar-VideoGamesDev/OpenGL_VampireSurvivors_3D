@@ -31,7 +31,7 @@ struct {
         Vec4 color;
         Vec4 pos;
         Vec4 view_pos;
-    } light_data;
+    } light_data; // CONVERTIR EN LISTA DE LUCES PARA TENER MÁS DE UNA Y QUE EL SHADER LAS UPDATEE TODA
 } scene;
 
 
@@ -261,6 +261,7 @@ fn draw_mesh(const Mesh* mesh, const Mat4& transform) -> void {
     
     for (auto& submesh: mesh->submeshes) {
 
+        // Set material properties for each submesh.
         Material* material_data = (Material*) asset_get(submesh.material);
         Shader* shader_data = (Shader*) asset_get(material_data->shader);
         Texture* diffuse_data = (Texture*) asset_get(material_data->texture_diffuse);
