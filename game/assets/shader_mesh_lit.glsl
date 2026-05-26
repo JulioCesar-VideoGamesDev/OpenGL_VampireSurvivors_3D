@@ -51,7 +51,7 @@ layout(location = 0) out vec4 o_col;
 
 uniform sampler2D u_samplers[MAX_TEXTURES];
 
-void main() {
+void main() { // Avoid hardcoding, add ambien, specular_color and defusse when creating the material
   float ambient_strenght = 0.5;
   float specular_strenght = 0.5;
 
