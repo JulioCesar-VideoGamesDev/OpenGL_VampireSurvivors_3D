@@ -1,0 +1,64 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"tasks": {
+        "version": "2.0.0",
+        "options": {
+            "cwd": "${workspaceFolder}" 
+        },
+        "presentation": {
+            "reveal": "always",
+            "clear": true
+        },
+		"tasks": [
+			{
+				"label": "build",
+				"type": "shell",
+				"command": "./build.bat",
+				"args": ["game", "debug"],
+				"group": {
+					"kind": "build",
+					"isDefault": true
+				}
+			}
+		]
+    },
+	"settings": {
+		"C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: LLVM, IndentWidth: 4, BreakBeforeBraces: Attach }",
+		"C_Cpp.dimInactiveRegions": false,
+		"files.associations": {
+			"*.rh": "cpp",
+			"xiosbase": "cpp",
+			"xlocinfo": "cpp",
+			"xstring": "cpp",
+			"memory": "cpp"
+		},
+		"search.exclude": {
+			"**/.vs": true,
+			"**/bin": true,
+			"**/bin-int": true,
+			"**/*.sln": true,
+			"**/*.vcxproj": true,
+			"**/*.vcxproj.filters": true,
+			"**/*.user": true,
+			"**/*.exe": true,
+		},
+	},
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "game",
+                "type": "cppvsdbg",
+                "request": "launch",
+				"console": "integratedTerminal",
+				"preLaunchTask": "build",
+				"program": "${workspaceFolder}/.bin/game/debug/game.exe",
+                "cwd": "${workspaceFolder}/game/assets",
+            }
+        ]
+    }
+}

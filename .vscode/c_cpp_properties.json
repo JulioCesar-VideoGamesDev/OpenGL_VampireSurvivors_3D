@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/3rd/miniaudio/**",
+                "${workspaceFolder}/3rd/khr/**",
+                "${workspaceFolder}/3rd/imgui/**",
+                "${workspaceFolder}/core/**",
+                "${workspaceFolder}/game/**"
+            ],
+            "defines": [
+                "GAME_DEBUG",
+                "GAME_GL", 
+                "GAME_WIN",
+                "WIN32",
+                "_WINDOWS",
+                "_UNICODE",
+                "UNICODE"
+            ],
+            "compilerPath": "cl.exe",
+            "intelliSenseMode": "msvc-x64",
+            "forcedInclude": [
+                "${workspaceFolder}/core/core_pch.h"
+            ]
+        }
+    ],
+    "version": 4
+}

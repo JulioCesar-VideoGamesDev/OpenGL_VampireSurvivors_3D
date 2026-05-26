@@ -1,0 +1,127 @@
+# Blender 5.0.0 MTL File: 'Kelsier blender.blend'
+# www.blender.org
+
+newmtl M_coins
+Kd 0.220780 0.120949 0.045240
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.520000
+d 1.000000
+illum 3
+Pr 0.152727
+Pm 0.870000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.000000
+aniso 0.000000
+anisor 0.250000
+
+newmtl M_eyes
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+Pr 0.000000
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd C:/Eye_Mesh_Mat_Eyeball_BaseColor.png
+
+newmtl M_face
+Kd 0.949020 0.196078 0.196078
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+Pr 0.000000
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.000000
+aniso 0.000000
+anisor 0.250000
+map_Bump -bm 1.000000 D:/Proyectos/2023/Kelsier/4-TEXTURE/Textures/jpg/KELSIER_TOPAINTER_face_Normal.jpg
+
+newmtl M_flasks
+Kd 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.520000
+d 1.000000
+illum 2
+Pr 0.000000
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.000000
+aniso 0.000000
+anisor 0.250000
+map_Bump -bm 1.000000 D:/Proyectos/2023/Kelsier/4-TEXTURE/Textures/jpg_flask/Flasks_ToPainter_flask_Normal.jpg
+
+newmtl M_lower
+Kd 0.317647 0.886275 0.396078
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+Pr 0.000000
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.000000
+aniso 0.000000
+anisor 0.250000
+map_Bump -bm 1.000000 D:/Proyectos/2023/Kelsier/4-TEXTURE/Textures/jpg/KELSIER_TOPAINTER_lower_Normal.jpg
+
+newmtl M_mistcloack
+Kd 0.266667 0.266667 0.266667
+Ks 0.068182 0.068182 0.068182
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+Pr 0.000000
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Bump -bm 1.000000 D:/Proyectos/2023/Kelsier/4-TEXTURE/Textures/jpg/KELSIER_TOPAINTER_Mistcloak_Normal.jpg
+
+newmtl M_tiras
+Ks 0.286364 0.286364 0.286364
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+illum 2
+Pr 0.904545
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd C:/mistcloak_albedo_tira.jpg
+map_d C:/mistcloak_alpha_tiras.jpg
+
+newmtl M_upper
+Kd 0.211765 0.878431 0.921569
+Ks 0.218182 0.218182 0.218182
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+Pr 0.000000
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.000000
+aniso 0.000000
+anisor 0.250000
+map_Bump -bm 1.000000 D:/Proyectos/2023/Kelsier/4-TEXTURE/Textures/jpg/KELSIER_TOPAINTER_upper_Normal.jpg
