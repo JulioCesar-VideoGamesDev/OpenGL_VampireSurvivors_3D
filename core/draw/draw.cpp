@@ -34,7 +34,6 @@ struct {
     } light_data; // CONVERTIR EN LISTA DE LUCES PARA TENER MÁS DE UNA Y QUE EL SHADER LAS UPDATEE TODA
 } scene;
 
-
 Shader mesh_shader;
 
 fn draw_init() -> void {

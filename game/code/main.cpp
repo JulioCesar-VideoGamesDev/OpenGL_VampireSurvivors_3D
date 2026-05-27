@@ -40,23 +40,29 @@ fn main() -> s32 {
 
     while(app_running()) {
        
-        frame_timer += os_delta_time();
-        
-        while(frame_timer >= frame_duration) {
-            frame_timer -= frame_duration;
-            curr_frame++;
-            if (curr_frame >= frame_count) {
-                curr_frame = 0;
-            }
-        }
+        // Frame management for 2D animations.
+        //frame_timer += os_delta_time();
+        //
+        //while(frame_timer >= frame_duration) { // Add here currentFrame++ to each entity so that they don't always use the same frame. (when the entity is not active, the current frame wouldn't increment).
+        //    frame_timer -= frame_duration;
+        //    curr_frame++;
+        //    if (curr_frame >= frame_count) {
+        //        curr_frame = 0;
+        //    }
+        //}
 
-        draw_update(os_delta_time()); // Update "camera" position
-        clear_back_buffer();
+        draw_update(os_delta_time()); // Update "camera" position.
+
+        // Start to draw
+        clear_back_buffer(); // We clear the back buffer to draw in it.
+
+        // 2D
         draw_sprite(&monk_run_texture, curr_frame, Color.White, Mat4::transform(F32.Zero, F32.Zero, Vec3(F32.One) * 3.0f));
 
-        box_spin += 30 * os_delta_time();
+        // 3D
+        //box_spin += 30 * os_delta_time();
         draw_mesh(&box_stack, Mat4::transform(Vec3(F32.Front) * 20.f, Vec3(0.0f, F32.to_radians(box_spin), 0.0f), Vec3(F32.One)));
-        os_swap_buffers();
+        os_swap_buffers(); // Now that we drew everything we need in the back buffer we swap it with the front one to show it.
     }
 
     texture_done(&monk_run_texture);
