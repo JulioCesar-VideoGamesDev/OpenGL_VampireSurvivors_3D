@@ -26,6 +26,8 @@ fn main() -> s32 {
     f32 frame_duration = 1.0f / (f32) anim_frames; 
     f32 frame_timer = 0.0f;
 
+    
+
     Mesh box_stack;
     Asset_Handle mesh_shader = asset_create(Asset_Kind_Shader);
     Shader* mesh_shader_data = (Shader*) asset_get(mesh_shader);
@@ -60,7 +62,7 @@ fn main() -> s32 {
         draw_sprite(&monk_run_texture, curr_frame, Color.White, Mat4::transform(F32.Zero, F32.Zero, Vec3(F32.One) * 3.0f));
 
         // 3D
-        //box_spin += 30 * os_delta_time();
+        box_spin += 30 * os_delta_time();
         draw_mesh(&box_stack, Mat4::transform(Vec3(F32.Front) * 20.f, Vec3(0.0f, F32.to_radians(box_spin), 0.0f), Vec3(F32.One)));
         os_swap_buffers(); // Now that we drew everything we need in the back buffer we swap it with the front one to show it.
     }

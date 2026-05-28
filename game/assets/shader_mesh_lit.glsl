@@ -33,11 +33,20 @@ void main() {
 
 #ifdef FRAGMENT_SHADER
 
-layout(std140, binding = 1) uniform Light_Data {
-  vec4 u_light_color;
-  vec4 u_light_pos;
-  vec4 u_view_pos;
+#define MAX_LIGHTS 32
+
+struct Light_Data {
+  vec4 color;
+  vec4 pos;
+  vec4 view_pos;
 };
+
+layout(std140, binding = 1) uniform LightBuffer {
+    Light_Data lights[MAX_LIGHTS];
+    vec4 light_count;
+};
+
+int count = int(light_count.x);
 
 in vec2 v_uv;
 in vec3 v_normal;
@@ -48,26 +57,29 @@ in flat int v_tex_unit;
 layout(location = 0) out vec4 o_col;
 
 #define MAX_TEXTURES 32
-
 uniform sampler2D u_samplers[MAX_TEXTURES];
 
-void main() { // Avoid hardcoding, add ambien, specular_color and defusse when creating the material
+void main() { // Avoid hardcoding, add ambient, specular_color and defusse when creating the material
   float ambient_strenght = 0.5;
   float specular_strenght = 0.5;
 
-  vec3 light_dir = normalize(vec3(u_light_pos) - v_frag_pos);
-  float diffuse_value = max(dot(v_normal, light_dir), 0.0);
+  vec3 finalLighting = vec3(0.0);
+  
+  for(int i = 0; i < count; i++) {
 
-  vec3 view_dir = normalize(vec3(u_view_pos) - v_frag_pos);
-  vec3 reflect_dir = reflect(-light_dir, v_normal);
-  float specular = pow(max(dot(view_dir, reflect_dir), 0.0), 64);
+    vec3 lightPos = lights[i].pos.xyz;
+    vec3 lightColor = lights[i].color.rgb;
 
-  vec4 ambient_color = u_light_color * ambient_strenght;
-  vec4 diffuse_color = u_light_color * diffuse_value;
-  vec4 specular_color = specular * specular_strenght * u_light_color;
+    vec3 L = normalize(lightPos - v_frag_pos);
 
-  vec4 light_color = vec4(ambient_color.rgb, 1.0) + vec4(diffuse_color.rgb, 1.0) + vec4(specular_color.rgb, 1.0);
-  o_col = light_color * texture(u_samplers[v_tex_unit], v_uv);
+    float diffuse = max(dot(v_normal, L), 0.0);
+
+    finalLighting += lightColor * diffuse;
+  }
+
+  vec4 tex = texture(u_samplers[v_tex_unit], v_uv);
+
+  o_col = vec4(finalLighting, 1.0) * tex;
 }
 
 #endif

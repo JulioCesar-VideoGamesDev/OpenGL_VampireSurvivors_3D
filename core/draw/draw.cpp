@@ -4,19 +4,39 @@
 #include "os_input.h"
 #include "io_model.h"
 
+// I define all the structs that I will need for the shaders.
+
 struct {
     Vertex_Buffer vbo;
     Shader shader;
 } quad;
 
+struct light_Data {
+  Vec4 color;
+  Vec4 pos;
+  Vec4 view_pos;
+} light_data; // CONVERTIR EN LISTA DE LUCES PARA TENER MÁS DE UNA Y QUE EL SHADER LAS UPDATEE TODA
+// In order to have multiple lights, ig I will need to make a list of light_data
+
+constexpr s32 MAX_LIGHTS = 32;
+
+struct Light_Buffer {
+  light_Data lights[MAX_LIGHTS];
+  Vec4 light_count;
+};
+
+
 struct {
     Camera camera;
     Free_Look camera_controller;
+
     s32 viewport_x = 1270;
     s32 viewport_y = 720;
+
+    Texture white;
+
     Global_Buffer gbo;
     Global_Buffer gbo_light_data;
-    Texture white;
 
     struct {
         Mat4 projection = Mat.Identity4;
@@ -25,13 +45,12 @@ struct {
         Vec2 uv_offset = F32.Zero;
         Vec4 tint = Color.White;
         s32  tex_unit = 0;
+
+        //Vec4 camera_pos;
     } global_data;
 
-    struct {
-        Vec4 color;
-        Vec4 pos;
-        Vec4 view_pos;
-    } light_data; // CONVERTIR EN LISTA DE LUCES PARA TENER MÁS DE UNA Y QUE EL SHADER LAS UPDATEE TODA
+    Light_Buffer light_buffer;
+
 } scene;
 
 Shader mesh_shader;
@@ -66,7 +85,7 @@ fn draw_init() -> void {
         shader_init(&quad.shader, {shader_filename});
 
         global_buffer_init(&scene.gbo, { sizeof(scene.global_data) });
-        global_buffer_init(&scene.gbo_light_data, { sizeof(scene.light_data) });
+        global_buffer_init(&scene.gbo_light_data, { sizeof(Light_Buffer) }); // In the future pass a list of all light_data in sizeof
     }
 
     Texture_Def def;
@@ -80,6 +99,12 @@ fn draw_init() -> void {
         const char* shader_filename = "shader_mesh.glsl";
         shader_init(&mesh_shader, {shader_filename});
     }
+
+    // Lights
+    /*Light_Data* light = &scene.light_buffer.lights[scene.light_buffer.light_count++];
+
+    light->pos = Vec4(x, y, z, 1.0f);
+    light->color = Vec4(r, g, b, intensity);*/
 }
 
 fn draw_sprite(const Texture* tex, s32 frame, Vec4 tint, const Mat4& transform) -> void {
@@ -251,11 +276,44 @@ fn draw_mesh(const Mesh* mesh, const Mat4& transform) -> void {
     global_buffer_use(scene.gbo, 0);
 
 	// Set up light data (for now, just a single white light at the vector zero and pointing to the camera position)
-    scene.light_data.color = Vec4(Color.White);
-    scene.light_data.pos = Vec4(0, 0, 0, 0);
-    scene.light_data.view_pos = Vec4(scene.camera.pos.x, scene.camera.pos.y, scene.camera.pos.z, 1.0);
+    /*light_data.color = Vec4(Color.White);
+    light_data.pos = Vec4(0, 0, 0, 0);
+    light_data.view_pos = Vec4(scene.camera.pos.x, scene.camera.pos.y, scene.camera.pos.z, 1.0);*/
+
+    scene.light_buffer.light_count.x = 3;
+
+    // Light 1
+    scene.light_buffer.lights[0].color = Vec4(1, 1, 1, 1); // White
+    scene.light_buffer.lights[0].pos = Vec4(0, 100, 0, 1);
+
+    scene.light_buffer.lights[0].view_pos =
+      Vec4(scene.camera.pos.x,
+        scene.camera.pos.y,
+        scene.camera.pos.z,
+        1.0f);
     
-    global_buffer_update(scene.gbo_light_data, &scene.light_data);
+    // Light 2
+    scene.light_buffer.lights[1].color = Vec4(1, 0, 0, 1);
+    scene.light_buffer.lights[1].pos = Vec4(0, 0, 0, 1);
+
+    scene.light_buffer.lights[1].view_pos =
+      Vec4(scene.camera.pos.x,
+        scene.camera.pos.y,
+        scene.camera.pos.z,
+        1.0f);
+
+    // Light 3
+    scene.light_buffer.lights[2].color = Vec4(0, 1, 0, 1);
+    scene.light_buffer.lights[2].pos = Vec4(0, 0, 100, 1);
+
+    scene.light_buffer.lights[2].view_pos =
+      Vec4(scene.camera.pos.x,
+        scene.camera.pos.y,
+        scene.camera.pos.z,
+        1.0f);
+
+    //printf("light_count = %f\n", scene.light_buffer.light_count.x);
+    global_buffer_update(scene.gbo_light_data, &scene.light_buffer);
     global_buffer_use(scene.gbo_light_data, 1);
     
     for (auto& submesh: mesh->submeshes) {
