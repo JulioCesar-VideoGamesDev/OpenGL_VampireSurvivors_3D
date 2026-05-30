@@ -432,6 +432,14 @@ private:
     Mat4 m_matrix;
 };
 
+// Hit struct to get the normal.
+struct HitResult
+{
+    bool hit = false;
+
+    Vec3 normal{};
+};
+
 // @Note: Axis Aligned Bounding Box.
 struct AABB {
     f32 x = 0.0f;
@@ -440,4 +448,25 @@ struct AABB {
     f32 half_h = 0.0f;
 
     static fn overlap(const AABB& a, const AABB& b) -> bool;
+    static fn hit(const AABB& a, const AABB& b)->HitResult;
+
 };
+
+AABB updateBoxCollisionPosition2D(Vec3 position, AABB collision);
+AABB setBoxCollisionSize2D(AABB collision, f32 vtx_maxWith, f32 vtx_maxHeight, Vec3 scale);
+
+struct AABB3D {
+    f32 x = 0.f;
+    f32 y = 0.f;
+    f32 z = 0.f;
+
+    f32 half_w = 0.f;
+    f32 half_h = 0.f;
+    f32 half_d = 0.f;
+
+    static fn overlap(const AABB3D& a, const AABB3D& b) -> bool;
+    static fn hit(const AABB3D& a, const AABB3D& b)->HitResult;
+};
+
+AABB3D updateBoxCollisionPosition3D(Vec3 position, AABB3D collision);
+AABB3D setBoxCollisionSize3D(AABB3D collision, f32 width, f32 height, f32 depth, Vec3 scale);

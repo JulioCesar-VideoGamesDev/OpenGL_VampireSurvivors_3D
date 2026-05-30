@@ -170,7 +170,8 @@ fn draw_done() -> void {
 
 fn draw_update(f32 dt) -> void {
     
-    bool use_editor_camera = os_key_down(Key_Code::Mouse_Right);
+    //bool use_editor_camera = os_key_down(Key_Code::Mouse_Right);
+    bool use_editor_camera = false;
 
     for (const auto& event : os_events_this_frame()) {
         if (use_editor_camera && event.type == Input_Event::Mouse_Move) {
@@ -196,6 +197,8 @@ fn draw_update(f32 dt) -> void {
         os_set_cursor_mode(Cursor_Mode::Default);
     }
 
+    scene.camera.pos = { 0,30,20 };
+    scene.camera.rot = { -60,0,0 };
     scene.camera.update_matrix(scene.viewport_x, scene.viewport_y);
     scene.global_data.projection = scene.camera.matrix();
     set_viewport(scene.viewport_x, scene.viewport_y);
@@ -294,7 +297,7 @@ fn draw_mesh(const Mesh* mesh, const Mat4& transform) -> void {
     
     // Light 2
     scene.light_buffer.lights[1].color = Vec4(1, 0, 0, 1);
-    scene.light_buffer.lights[1].pos = Vec4(0, 0, 0, 1);
+    scene.light_buffer.lights[1].pos = Vec4(100, 0, -100, 1);
 
     scene.light_buffer.lights[1].view_pos =
       Vec4(scene.camera.pos.x,
@@ -304,7 +307,7 @@ fn draw_mesh(const Mesh* mesh, const Mat4& transform) -> void {
 
     // Light 3
     scene.light_buffer.lights[2].color = Vec4(0, 1, 0, 1);
-    scene.light_buffer.lights[2].pos = Vec4(0, 0, 100, 1);
+    scene.light_buffer.lights[2].pos = Vec4(-100, 0, 100, 1);
 
     scene.light_buffer.lights[2].view_pos =
       Vec4(scene.camera.pos.x,

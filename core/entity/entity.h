@@ -10,6 +10,8 @@
 
 #define ForEntityTypes(EntityType)  \
     EntityType(Player)              \
+    EntityType(Enemy)               \
+    EntityType(Bullet)              \
 
 // ---------------------------------------------------
 
@@ -19,42 +21,42 @@
 // Kind enum.
 enum Entity_Kind : u64 {
     Entity_Kind_None = 0,
-    #define DeclareEnumEntry(EntityType) \
+#define DeclareEnumEntry(EntityType) \
         EntityKind(EntityType),
 
-        ForEntityTypes(DeclareEnumEntry)
-    
-    #undef DeclareEnumEntry
+    ForEntityTypes(DeclareEnumEntry)
+
+#undef DeclareEnumEntry
 };
 
 inline fn to_string(Entity_Kind kind) -> const char* {
     switch (kind) {
-        #define DeclareCaseEntry(EntityType) \
+#define DeclareCaseEntry(EntityType) \
             case EntityKind(EntityType): return Stringify(EntityKind(EntityType));
 
-            ForEntityTypes(DeclareCaseEntry)
-        #undef DeclareCaseEntry
-        
-        default: return "";
+        ForEntityTypes(DeclareCaseEntry)
+#undef DeclareCaseEntry
+
+    default: return "";
     }
 }
 
 inline fn from_string(std::string_view str, Entity_Kind* pKind) {
-    #define DeclareIfEntry(EntityType)                  \
+#define DeclareIfEntry(EntityType)                  \
         if (str == Stringify(EntityKind(EntityType))) { \
            *pKind = EntityKind(EntityType);             \
             return;                                     \
         }
 
-        ForEntityTypes(DeclareIfEntry)
-        #undef DeclareIfEntry
+    ForEntityTypes(DeclareIfEntry)
+#undef DeclareIfEntry
 }
 
 // Forward declarations.
 #define ForwardDeclare(EntityType) \
     struct EntityType;
-    
-    ForEntityTypes(ForwardDeclare)
+
+ForEntityTypes(ForwardDeclare)
 
 #undef ForwardDeclare
 
@@ -74,13 +76,23 @@ inline fn from_string(std::string_view str, Entity_Kind* pKind) {
 // Base entity type.
 struct Entity {
     Entity_Kind kind = Entity_Kind_None;
+
     bool enabled = true;
     bool visible = true;
+
     Vec3 pos = F32.Zero;
     Vec3 rot = F32.Zero;
     Vec3 scl = F32.One;
+
     Vec4 tint = Color.White;
     s32  sprite = 0;
+
+    s32 frame_count = 0;
+    s32 curr_frame = 0;
+    f32 frame_timer = 0.f;
+
+    f32 frame_duration = 0.f;
+
     struct Texture* tex = nullptr; // @Pending: This should be an asset handle.
 };
 
@@ -181,7 +193,7 @@ fn deserialize_fields_base_entity(Deserializer* d, Entity* e) -> bool {
 // Entity handle.
 struct Entity_Handle {
     Entity_Kind kind = Entity_Kind_None;
-    Array_Handle value;
+    Array_Handle value{};
 };
 
 #define EntityStorage(EntityType) \
@@ -189,23 +201,23 @@ struct Entity_Handle {
 
 // Entity_Storage: Entity manager.
 struct Entity_Storage {
-    #define DeclareStorageVar(EntityType) \
+#define DeclareStorageVar(EntityType) \
         Fixed_Handle_Array<EntityType> EntityStorage(EntityType);
-        
-        ForEntityTypes(DeclareStorageVar)
 
-    #undef DeclareStorageVar
+    ForEntityTypes(DeclareStorageVar)
+
+#undef DeclareStorageVar
 };
 
 fn entity_storage_init() -> void;
 fn entity_storage_done() -> void;
-fn entity_create(Entity_Kind kind) -> Entity_Handle;
+fn entity_create(Entity_Kind kind)->Entity_Handle;
 fn entity_destroy(Entity_Handle handle) -> void; // @Pending: Save the entities to a cleanup list and wait till the frame ends.
-fn entity_get(Entity_Handle handle) -> Entity*;
+fn entity_get(Entity_Handle handle)->Entity*;
 fn entity_pass(void (*update)(Entity*)) -> void;
 
 #define EntityGet(EntityType, EntityHandle) \
-    (EntityType*) entity_get(EntityHanle)
+    (EntityType*) entity_get(EntityHandle)
 
 #endif
 
@@ -222,7 +234,7 @@ fn entity_storage_init() -> void {
     if (world) {
         entity_storage_done();
     }
-    
+
     world = new Entity_Storage();
 }
 
@@ -230,19 +242,19 @@ fn entity_storage_done() -> void {
     if (!world) {
         return;
     }
-    #define FreeStorage(EntityType) \
+#define FreeStorage(EntityType) \
         reset(&world->EntityStorage(EntityType));
-    
-        ForEntityTypes(FreeStorage)
-    #undef FreeStorage
 
-    delete world;
+    ForEntityTypes(FreeStorage)
+#undef FreeStorage
+
+        delete world;
     world = nullptr;
 }
 
 fn entity_create(Entity_Kind kind) -> Entity_Handle {
     switch (kind) {
-        #define ChooseStorage(EntityType)                                      \
+#define ChooseStorage(EntityType)                                      \
             case EntityKind(EntityType):                                       \
             {                                                                  \
                 auto handle = append(&world->EntityStorage(EntityType));       \
@@ -252,48 +264,48 @@ fn entity_create(Entity_Kind kind) -> Entity_Handle {
                 return { base->kind, handle };                                 \
             }
 
-            ForEntityTypes(ChooseStorage)
+        ForEntityTypes(ChooseStorage)
 
-        #undef ChooseStorage
+#undef ChooseStorage
 
-        case Entity_Kind_None:
-        default:
-            return {};
+    case Entity_Kind_None:
+    default:
+        return {};
     }
 }
 
 fn entity_destroy(Entity_Handle handle) -> void {
     switch (handle.kind) {
-        #define ChooseStorage(EntityType)                                    \
+#define ChooseStorage(EntityType)                                    \
             case EntityKind(EntityType):                                     \
                     remove(&world->EntityStorage(EntityType), handle.value); \
 
-            ForEntityTypes(ChooseStorage)
-        #undef ChooseStorage
-        case Entity_Kind_None:
-        default:
-            return;
+        ForEntityTypes(ChooseStorage)
+#undef ChooseStorage
+    case Entity_Kind_None:
+    default:
+        return;
     }
 }
 
 fn entity_get(Entity_Handle handle) -> Entity* {
     static Entity def;
     switch (handle.kind) {
-        #define ChooseStorage(EntityType)                                                   \
+#define ChooseStorage(EntityType)                                                   \
             case EntityKind(EntityType):                                                    \
                 return (Entity*) get(world->EntityStorage(EntityType), handle.value);       \
-                
-                ForEntityTypes(ChooseStorage)
-        
-        #undef ChooseStorage
-            case Entity_Kind_None:
-            default:                                                
-                return &def;           
+
+        ForEntityTypes(ChooseStorage)
+
+#undef ChooseStorage
+    case Entity_Kind_None:
+    default:
+        return &def;
     }
 }
 
 fn entity_pass(void (*update)(Entity*)) -> void {
-    #define DoPass(EntityType)                                       \
+#define DoPass(EntityType)                                       \
         for(EntityType& entity: world->EntityStorage(EntityType)) {  \
             auto* base = (Entity*) &entity;                          \
             if (base->enabled) {                                     \

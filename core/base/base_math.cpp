@@ -672,7 +672,129 @@ fn Camera::update_matrix(s32 viewport_x, s32 viewport_y) -> void {
     m_matrix = Mat4::transpose(p * v);
 }
 
+// 2d
+
 fn AABB::overlap(const AABB& a, const AABB& b) -> bool {
     return (abs(a.x - b.x) <= (a.half_w + b.half_w)) &&
            (abs(a.y - b.y) <= (a.half_h + b.half_h));
+}
+
+fn AABB::hit(const AABB& a, const AABB& b) -> HitResult
+{
+    HitResult result{};
+
+    f32 dx = b.x - a.x;
+    f32 px = (a.half_w + b.half_w) - abs(dx);
+
+    if (px <= 0.f)
+        return result;
+
+    f32 dy = b.y - a.y;
+    f32 py = (a.half_h + b.half_h) - abs(dy);
+
+    if (py <= 0.f)
+        return result;
+
+    result.hit = true;
+
+    if (px < py)
+    {
+        result.normal.x = (dx < 0.f) ? -1.f : 1.f;
+    }
+    else
+    {
+        result.normal.y = (dy < 0.f) ? -1.f : 1.f;
+    }
+
+    return result;
+}
+
+AABB updateBoxCollisionPosition2D(Vec3 position, AABB collision)
+{
+    collision.x = position.x;
+    collision.y = position.y;
+
+    return collision;
+}
+
+AABB setBoxCollisionSize2D(AABB collision, f32 vtx_maxWithPosition, f32 vtx_maxHeightPosition, Vec3 scale)
+{
+    collision.half_w = vtx_maxWithPosition * scale.x; // QUAD_VTS[2]
+    collision.half_h = vtx_maxHeightPosition * scale.y; // QUAD_VTS[5]
+
+    return collision;
+}
+
+// 3D
+
+fn AABB3D::overlap(const AABB3D& a, const AABB3D& b) -> bool {
+    return
+        (abs(a.x - b.x) <= (a.half_w + b.half_w)) &&
+        (abs(a.y - b.y) <= (a.half_h + b.half_h)) &&
+        (abs(a.z - b.z) <= (a.half_d + b.half_d));
+}
+
+fn AABB3D::hit(const AABB3D& a, const AABB3D& b) -> HitResult
+{
+    HitResult result{};
+
+    f32 dx = b.x - a.x;
+    f32 px = (a.half_w + b.half_w) - abs(dx);
+
+    if (px <= 0.f)
+        return result;
+
+    f32 dy = b.y - a.y;
+    f32 py = (a.half_h + b.half_h) - abs(dy);
+
+    if (py <= 0.f)
+        return result;
+
+    f32 dz = b.z - a.z;
+    f32 pz = (a.half_d + b.half_d) - abs(dz);
+
+    if (pz <= 0.f)
+        return result;
+
+    result.hit = true;
+
+    if (px < py && px < pz)
+    {
+        result.normal.x = (dx < 0.f) ? -1.f : 1.f;
+    }
+    else if (py < pz)
+    {
+        result.normal.y = (dy < 0.f) ? -1.f : 1.f;
+    }
+    else
+    {
+        result.normal.z = (dz < 0.f) ? -1.f : 1.f;
+    }
+
+    return result;
+}
+
+AABB3D updateBoxCollisionPosition3D(
+    Vec3 position,
+    AABB3D collision)
+{
+    collision.x = position.x;
+    collision.y = position.y;
+    collision.z = position.z;
+
+    return collision;
+}
+
+AABB3D setBoxCollisionSize3D(
+    AABB3D collision,
+    f32 width,
+    f32 height,
+    f32 depth,
+    Vec3 scale)
+{
+    collision.half_w = width * scale.x;
+    collision.half_h = height * scale.y;
+    collision.half_d = depth * scale.z;
+
+    return collision;
 }
